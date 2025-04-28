@@ -1,0 +1,44 @@
+from django.db import models
+
+# Create your models here.
+class Fan(models.Model):
+    nome = models.CharField(max_length=255)
+    endereco = models.TextField()
+    cpf = models.CharField(max_length=14, unique=True)
+    telefone = models.CharField(max_length=20)
+    jogos_favoritos = models.TextField()
+    streamers_favoritos = models.TextField()
+    criado_em = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.nome
+    
+class DocumentoIdentidade(models.Model):
+    fan = models.OneToOneField(Fan, on_delete=models.CASCADE)
+    documento = models.FileField(upload_to='documentos/')
+    dados_extraidos = models.JSONField(null=True, blank=True)  # Resultado do OCR
+    validado = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Documento de {self.fan.nome}"
+
+
+class RedeSocial(models.Model):
+    fan = models.ForeignKey(Fan, on_delete=models.CASCADE, related_name='redes_sociais')
+    plataforma = models.CharField(max_length=50)  # Ex: Twitter, Instagram, Twitch  YouTube e por ai vai
+    usuario = models.CharField(max_length=255)
+    url = models.URLField()
+    dados_extraidos = models.JSONField(null=True, blank=True)  # Dados públicos coletados
+
+    def __str__(self):
+        return f"{self.plataforma} - {self.usuario}"
+
+
+class PerfilEsports(models.Model):
+    fan = models.ForeignKey(Fan, on_delete=models.CASCADE, related_name='perfis_esports')
+    site = models.CharField(max_length=100)  # Ex: HLTV, Liquipedia, VLR?
+    url = models.URLField()
+    verificado = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.site} de {self.fan.nome}"

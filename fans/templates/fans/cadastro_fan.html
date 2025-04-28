@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro do Fã</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h2 class="mb-4">Cadastro do Fã</h2>
+        <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ fan_form.as_p }}
+            </div>
+            <h5>Upload de Documento (RG ou CNH)</h5>
+            <div class="mb-3">
+                {{ documento_form.as_p }}
+            </div>
+            <button type="submit" class="btn btn-primary">Próximo</button>
+        </form>
+    </div>
+</body>
+</html>
