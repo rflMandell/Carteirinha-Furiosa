@@ -1,19 +1,32 @@
 from django.shortcuts import render, redirect
 from .forms import FanForm, DocumentoIdentidadeForm, RedeSocialForm, PerfilEsportsForm
+from fans.services.ocr_service import extrair_texto_documento
 
 def cadastro_fan(request):
     if request.method == 'POST':
         fan_form = FanForm(request.POST)
         documento_form = DocumentoIdentidadeForm(request.POST, request.FILES)
-
+        
         if fan_form.is_valid() and documento_form.is_valid():
             fan = fan_form.save()
+
             documento = documento_form.save(commit=False)
             documento.fan = fan
             documento.save()
 
-            return redirect('cadastro_redes_sociais', fan_id=fan.id)
+            # Validação OCR
+            texto_extraido = extrair_texto_documento(documento.documento.path)
 
+            # Aqui podemos fazer verificações básicas:
+            nome = fan.nome.lower()
+            cpf = fan.cpf.replace(".", "").replace("-", "")
+
+            if nome not in texto_extraido.lower() or cpf not in texto_extraido:
+                fan.delete()  # Deleta cadastro inválido
+                documento.delete()
+                return HttpResponse("Falha na validação do documento. Por favor, envie um documento legível.", status=400)
+
+            return redirect('cadastro_redes_sociais')
     else:
         fan_form = FanForm()
         documento_form = DocumentoIdentidadeForm()
