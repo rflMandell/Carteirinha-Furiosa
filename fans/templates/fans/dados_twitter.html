@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Dados do Twitter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h2 class="mb-4">Dados do Twitter Vinculado</h2>
+        <ul class="list-group">
+            <li class="list-group-item"><strong>Nome:</strong> {{ dados_twitter.nome }}</li>
+            <li class="list-group-item"><strong>Descrição:</strong> {{ dados_twitter.descricao }}</li>
+            <li class="list-group-item"><strong>Seguindo:</strong> {{ dados_twitter.seguindo }}</li>
+            <li class="list-group-item"><strong>Seguidores:</strong> {{ dados_twitter.seguidores }}</li>
+            <li class="list-group-item"><strong>Total de Tweets:</strong> {{ dados_twitter.tweets }}</li>
+        </ul>
+        <a href="{% url 'cadastro_redes_sociais' %}" class="btn btn-primary mt-4">Voltar</a>
+    </div>
+</body>
+</html>

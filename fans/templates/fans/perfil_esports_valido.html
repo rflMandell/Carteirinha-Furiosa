@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil de Esports Vinculado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h2 class="mb-4">Perfil de Esports Vinculado com Sucesso</h2>
+        <p>O link do seu perfil de esports foi validado e vinculado ao seu cadastro!</p>
+        <ul class="list-group">
+            <li class="list-group-item"><strong>Link do Perfil:</strong> {{ fan.perfil_esports_link }}</li>
+        </ul>
+        <a href="{% url 'perfil' fan.id %}" class="btn btn-primary mt-4">Voltar ao Perfil</a>
+    </div>
+</body>
+</html>

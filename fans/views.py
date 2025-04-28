@@ -1,6 +1,10 @@
 from django.shortcuts import render, redirect
-from .forms import FanForm, DocumentoIdentidadeForm, RedeSocialForm, PerfilEsportsForm
+from django.http import HttpResponse
+from .forms import FanForm, DocumentoIdentidadeForm, RedeSocialForm, PerfilEsportsForm, TwitterForm, EsportsProfileForm
 from fans.services.ocr_service import extrair_texto_documento
+from fans.services.twitter_service import obter_dados_twitter
+from .models import Fan
+from .services.esports_service import validar_link_esports
 
 def cadastro_fan(request):
     if request.method == 'POST':
@@ -65,3 +69,47 @@ def cadastro_redes_sociais(request, fan_id):
 
 def cadastro_finalizado(request):
     return render(request, 'fans/cadastro_finalizado.html')
+
+def vincular_twitter(request, fan_id):
+    fan = Fan.objects.get(id=fan_id)
+
+    if request.method == 'POST':
+        form = TwitterForm(request.POST)
+        if form.is_valid():
+            twitter_handle = form.cleaned_data['twitter_handle']
+            dados_twitter = obter_dados_twitter(twitter_handle)
+
+            if dados_twitter:
+                # Armazenar dados do Twitter no banco de dados (se necessário)
+                fan.twitter_handle = twitter_handle
+                fan.save()
+
+                # Exibir dados do Twitter para o usuário
+                return render(request, 'fans/dados_twitter.html', {'dados_twitter': dados_twitter, 'fan': fan})
+            else:
+                return HttpResponse("Falha ao acessar o perfil do Twitter. Tente novamente.", status=400)
+    else:
+        form = TwitterForm()
+
+    return render(request, 'fans/vincular_twitter.html', {'form': form, 'fan': fan})
+
+def vincular_perfil_esports(request, fan_id):
+    fan = Fan.objects.get(id=fan_id)
+
+    if request.method == 'POST':
+        form = EsportsProfileForm(request.POST)
+        if form.is_valid():
+            link_perfil = form.cleaned_data['link_perfil_esports']
+
+            if link_perfil and validar_link_esports(link_perfil):
+                # Armazenar o link do perfil de esports no banco de dados
+                fan.perfil_esports_link = link_perfil
+                fan.save()
+
+                return render(request, 'fans/perfil_esports_valido.html', {'fan': fan})
+            else:
+                return HttpResponse("Link de perfil de esports inválido ou não pertence a plataformas válidas.", status=400)
+    else:
+        form = EsportsProfileForm()
+
+    return render(request, 'fans/vincular_perfil_esports.html', {'form': form, 'fan': fan})
