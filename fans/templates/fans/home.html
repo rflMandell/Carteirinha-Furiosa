@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Início | Know Your Fan{% endblock %}
+
+{% block content %}
+<section class="relative">
+  <img src="{% static 'images/banner-furia.jpg' %}" alt="Banner FURIA" class="w-full h-96 object-cover">
+  <div class="absolute inset-0 bg-black bg-opacity-60 flex flex-col justify-center items-center text-center text-white px-4">
+    <h1 class="text-4xl md:text-5xl font-bold tracking-wide uppercase mb-4">Conheça o Know Your Fan</h1>
+    <p class="text-lg md:text-xl text-gray-300 max-w-2xl">A plataforma oficial da FURIA para entender e se conectar com você, fã de esports.</p>
+    <a href="{% url 'formulario' %}" class="mt-6 inline-block bg-yellow-500 hover:bg-yellow-600 text-black font-bold uppercase px-6 py-3 rounded-lg transition">Começar Agora</a>
+  </div>
+</section>
+
+<section class="bg-white text-black py-16 px-6 md:px-16 text-center">
+  <h2 class="text-3xl md:text-4xl font-bold uppercase mb-8">O que você pode fazer</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+    <div class="p-6 border border-gray-200 rounded-xl shadow hover:shadow-lg transition">
+      <h3 class="text-xl font-semibold uppercase mb-2">Criar seu perfil</h3>
+      <p>Preencha dados básicos, seus interesses no universo FURIA, e nos diga quem são seus jogadores e streamers favoritos.</p>
+    </div>
+    <div class="p-6 border border-gray-200 rounded-xl shadow hover:shadow-lg transition">
+      <h3 class="text-xl font-semibold uppercase mb-2">Validar identidade</h3>
+      <p>Envie documentos e comprove sua identidade com tecnologia de reconhecimento OCR alimentada por IA.</p>
+    </div>
+    <div class="p-6 border border-gray-200 rounded-xl shadow hover:shadow-lg transition">
+      <h3 class="text-xl font-semibold uppercase mb-2">Receber conteúdos exclusivos</h3>
+      <p>Receba atualizações e notícias sobre seus interesses diretamente no WhatsApp. Você escolhe o que importa.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

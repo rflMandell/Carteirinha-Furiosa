@@ -118,3 +118,6 @@ def twitter_info_view(request):
         form = TwitterForm()
 
     return render(request, 'fans/twitter_info.html', {'form': form, 'dados_twitter': dados_twitter})
+
+def home(request):
+    return render(request, 'fans/home.html')
