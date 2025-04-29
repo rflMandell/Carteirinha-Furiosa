@@ -104,7 +104,7 @@ def instagram_info_view(request):
     else:
         form = InstagramForm()
 
-    return render(request, 'usuarios/instagram_info.html', {'form': form, 'dados_instagram': dados_instagram})
+    return render(request, 'fans/instagram_info.html', {'form': form, 'dados_instagram': dados_instagram})
 
 def twitter_info_view(request):
     dados_twitter = None
@@ -117,4 +117,4 @@ def twitter_info_view(request):
     else:
         form = TwitterForm()
 
-    return render(request, 'usuarios/twitter_info.html', {'form': form, 'dados_twitter': dados_twitter})
+    return render(request, 'fans/twitter_info.html', {'form': form, 'dados_twitter': dados_twitter})
