@@ -135,3 +135,11 @@ TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
 TWITTER_API_SECRET_KEY = os.getenv("TWITTER_API_SECRET_KEY")
 TWITTER_ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
 TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]

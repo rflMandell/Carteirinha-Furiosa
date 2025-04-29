@@ -1,28 +1,50 @@
 {% load static %}
 
-<footer class="w-full bg-black text-white text-xs uppercase tracking-wide px-8 py-10 flex flex-col gap-6 mt-10">
-  <div class="flex flex-wrap justify-between gap-10">
-    <div class="flex flex-col gap-2">
-      <span class="font-bold">Ajuda</span>
-      <a href="#" class="hover:underline">Contato</a>
-      <a href="#" class="hover:underline">Trocas e devoluções</a>
-      <a href="#" class="hover:underline">FAQ</a>
+<footer class="w-full bg-white text-dark border-t py-12 px-6 md:px-16">
+  <div class="flex flex-col md:flex-row justify-between gap-12 flex-wrap">
+    
+    <!-- Newsletter -->
+    <div class="md:w-1/4">
+      <h6 class="text-uppercase font-bold mb-4">SEJA O PRIMEIRO A SABER DAS NOSSAS NOVIDADES:</h6>
+      <div class="flex">
+        <input type="email" class="border border-dark px-3 py-2 w-full rounded-l" placeholder="Seu e-mail">
+        <button class="bg-black text-white px-4 py-2 rounded-r hover:bg-gray-800 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+          </svg>
+        </button>
+      </div>
     </div>
-    <div class="flex flex-col gap-2">
-      <span class="font-bold">Institucional</span>
-      <a href="#" class="hover:underline">Sobre a FURIA</a>
-      <a href="#" class="hover:underline">Imprensa</a>
-      <a href="#" class="hover:underline">Política de Privacidade</a>
+
+    <!-- Informações -->
+    <div class="md:w-1/4">
+      <h6 class="text-uppercase font-bold mb-4">INFORMAÇÕES</h6>
+      <ul class="space-y-2">
+        <li><a href="https://www.furia.gg/quem-somos" class="text-dark hover:underline">Quem somos</a></li>
+      </ul>
     </div>
-    <div class="flex flex-col gap-2">
-      <span class="font-bold">Minha Conta</span>
-      <a href="#" class="hover:underline">Entrar</a>
-      <a href="#" class="hover:underline">Meus pedidos</a>
-      <a href="#" class="hover:underline">Dados pessoais</a>
+
+    <!-- Políticas -->
+    <div class="md:w-1/4">
+      <h6 class="text-uppercase font-bold mb-4">POLÍTICAS</h6>
+      <ul class="space-y-2">
+        <li><a href="https://www.furia.gg/politica-privacidade" class="text-dark hover:underline">Política de Privacidade</a></li>
+        <li><a href="https://www.furia.gg/politica-cookie" class="text-dark hover:underline">Política de Cookie</a></li>
+      </ul>
+    </div>
+
+    <!-- Redes Sociais -->
+    <div class="md:w-1/4">
+      <h6 class="text-uppercase font-bold mb-4">SIGA FURIA</h6>
+      <div class="flex gap-4">
+        <a href="https://www.instagram.com/furiagg/" target="_blank">
+          <img src="{% static 'images/insta-logo.avif' %}" alt="Instagram" width="24" height="24">
+        </a>
+      </div>
     </div>
   </div>
 
-  <div class="border-t border-gray-600 pt-4 text-center text-gray-400">
-    © 2025 FURIA. Todos os direitos reservados.
+  <div class="border-t border-gray-300 mt-8 pt-4 text-center text-sm text-gray-500">
+    © 2024 Furia. All Rights Reserved.
   </div>
 </footer>
