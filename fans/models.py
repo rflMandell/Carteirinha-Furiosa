@@ -3,6 +3,8 @@ from django.db import models
 # Create your models here.
 class Fan(models.Model):
     nome = models.CharField(max_length=255)
+    cpf = models.CharField(max_length=14)
+    endereco = models.TextField()
     email = models.EmailField()
     numero_whatsapp = models.CharField(max_length=20)
 
