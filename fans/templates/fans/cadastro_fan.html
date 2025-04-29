@@ -9,14 +9,10 @@
 <body class="bg-light">
     <div class="container py-5">
         <h2 class="mb-4">Cadastro do Fã</h2>
-        <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+        <form method="post" class="card p-4 shadow-sm">
             {% csrf_token %}
             <div class="mb-3">
                 {{ fan_form.as_p }}
-            </div>
-            <h5>Upload de Documento (RG ou CNH)</h5>
-            <div class="mb-3">
-                {{ documento_form.as_p }}
             </div>
             <button type="submit" class="btn btn-primary">Próximo</button>
         </form>

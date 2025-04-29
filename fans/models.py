@@ -3,8 +3,6 @@ from django.db import models
 # Create your models here.
 class Fan(models.Model):
     nome = models.CharField(max_length=255)
-    cpf = models.CharField(max_length=14)
-    endereco = models.TextField()
     email = models.EmailField()
     numero_whatsapp = models.CharField(max_length=20)
 
@@ -12,20 +10,10 @@ class Fan(models.Model):
     twitter_username = models.CharField(max_length=100, blank=True, null=True)
     twitch_username = models.CharField(max_length=100, blank=True, null=True)
     instagram_username = models.CharField(max_length=100, blank=True, null=True)
-    youtube_channel_id = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.nome
     
-class DocumentoIdentidade(models.Model):
-    fan = models.OneToOneField(Fan, on_delete=models.CASCADE)
-    documento = models.FileField(upload_to='documentos/')
-    dados_extraidos = models.JSONField(null=True, blank=True)  # Resultado do OCR
-    validado = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Documento de {self.fan.nome}"
-
 
 class RedeSocial(models.Model):
     fan = models.ForeignKey(Fan, on_delete=models.CASCADE, related_name='redes_sociais')

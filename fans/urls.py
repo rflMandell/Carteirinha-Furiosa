@@ -8,4 +8,5 @@ urlpatterns = [
     path('vincular_perfil_esports/<int:fan_id>/', views.vincular_perfil_esports, name='vincular_perfil_esports'),
     path('instagram/', views.instagram_info_view, name='instagram_info'),
     path('twitter/', views.twitter_info_view, name='twitter_info'),
+    path('', views.home, name='home'),
 ]

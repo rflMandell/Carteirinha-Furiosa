@@ -1,47 +1,24 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .forms import FanForm, DocumentoIdentidadeForm, RedeSocialForm, PerfilEsportsForm, TwitterForm, EsportsProfileForm, InstagramForm
-from fans.services.ocr_service import extrair_texto_documento
+from .forms import FanForm, RedeSocialForm, PerfilEsportsForm, TwitterForm, EsportsProfileForm, InstagramForm
 from fans.services.rede_sociais.twitter_service import obter_dados_twitter
 from fans.services.rede_sociais.instagram_service import buscar_informacoes_instagram
 from .models import Fan
 from .services.esports_service import validar_link_esports
 
-
 def cadastro_fan(request):
     if request.method == 'POST':
         fan_form = FanForm(request.POST)
-        documento_form = DocumentoIdentidadeForm(request.POST, request.FILES)
         
-        if fan_form.is_valid() and documento_form.is_valid():
+        if fan_form.is_valid():
             fan = fan_form.save()
-
-            documento = documento_form.save(commit=False)
-            documento.fan = fan
-            documento.save()
-
-            # Validação OCR
-            texto_extraido = extrair_texto_documento(documento.documento.path)
-
-            # Aqui podemos fazer verificações básicas:
-            nome = fan.nome.lower()
-            cpf = fan.cpf.replace(".", "").replace("-", "")
-
-            if nome not in texto_extraido.lower() or cpf not in texto_extraido:
-                fan.delete()  # Deleta cadastro inválido
-                documento.delete()
-                return HttpResponse("Falha na validação do documento. Por favor, envie um documento legível.", status=400)
-
-            return redirect('cadastro_redes_sociais')
+            return redirect('cadastro_redes_sociais', fan_id=fan.id)  # Passa o fan_id
     else:
         fan_form = FanForm()
-        documento_form = DocumentoIdentidadeForm()
 
     return render(request, 'fans/cadastro_fan.html', {
         'fan_form': fan_form,
-        'documento_form': documento_form,
     })
-
 
 def cadastro_redes_sociais(request, fan_id):
     if request.method == 'POST':
@@ -67,7 +44,6 @@ def cadastro_redes_sociais(request, fan_id):
         'rede_form': rede_form,
         'perfil_form': perfil_form,
     })
-
 
 def cadastro_finalizado(request):
     return render(request, 'fans/cadastro_finalizado.html')

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'fans/base.html' %}
 {% load static %}
 
 {% block title %}Início | Know Your Fan{% endblock %}
@@ -9,7 +9,7 @@
   <div class="absolute inset-0 bg-black bg-opacity-60 flex flex-col justify-center items-center text-center text-white px-4">
     <h1 class="text-4xl md:text-5xl font-bold tracking-wide uppercase mb-4">Conheça o Know Your Fan</h1>
     <p class="text-lg md:text-xl text-gray-300 max-w-2xl">A plataforma oficial da FURIA para entender e se conectar com você, fã de esports.</p>
-    <a href="{% url 'formulario' %}" class="mt-6 inline-block bg-yellow-500 hover:bg-yellow-600 text-black font-bold uppercase px-6 py-3 rounded-lg transition">Começar Agora</a>
+    <a href="{% url 'cadastro_fan' %}" class="mt-6 inline-block bg-yellow-500 hover:bg-yellow-600 text-black font-bold uppercase px-6 py-3 rounded-lg transition">Começar Agora</a>
   </div>
 </section>
 
@@ -19,10 +19,6 @@
     <div class="p-6 border border-gray-200 rounded-xl shadow hover:shadow-lg transition">
       <h3 class="text-xl font-semibold uppercase mb-2">Criar seu perfil</h3>
       <p>Preencha dados básicos, seus interesses no universo FURIA, e nos diga quem são seus jogadores e streamers favoritos.</p>
-    </div>
-    <div class="p-6 border border-gray-200 rounded-xl shadow hover:shadow-lg transition">
-      <h3 class="text-xl font-semibold uppercase mb-2">Validar identidade</h3>
-      <p>Envie documentos e comprove sua identidade com tecnologia de reconhecimento OCR alimentada por IA.</p>
     </div>
     <div class="p-6 border border-gray-200 rounded-xl shadow hover:shadow-lg transition">
       <h3 class="text-xl font-semibold uppercase mb-2">Receber conteúdos exclusivos</h3>

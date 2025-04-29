@@ -1,19 +1,13 @@
 from django import forms
-from .models import Fan, DocumentoIdentidade, RedeSocial, PerfilEsports
+from .models import Fan, RedeSocial, PerfilEsports
 
 class FanForm(forms.ModelForm):
     class Meta:
         model = Fan
         fields = [
-            'nome', 'cpf', 'endereco', 'email', 'numero_whatsapp',
-            'twitter_username', 'twitch_username', 'instagram_username', 'youtube_channel_id'
+            'nome', 'email', 'numero_whatsapp',
+            'twitter_username', 'twitch_username', 'instagram_username',
         ]
-
-
-class DocumentoIdentidadeForm(forms.ModelForm):
-    class Meta:
-        model = DocumentoIdentidade
-        fields = ['documento']
 
 
 class RedeSocialForm(forms.ModelForm):
