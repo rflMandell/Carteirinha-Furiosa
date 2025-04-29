@@ -15,7 +15,7 @@ load_dotenv()
 
 def buscar_informacoes_esports(usuario):
     """Simulação de busca de informações de esports para o usuário."""
-    # Aqui no MVP vamos apenas montar uma mensagem de exemplo
+    # mensagem de exemplo
     return f"Olá {usuario.nome}, hoje seu time favorito tem jogo! Não perca! 🏆"
 
 def enviar_notificacoes():
@@ -29,7 +29,7 @@ def enviar_notificacoes():
 
 def iniciar_agendamento():
     """Agendamento periódico para envio de notificações."""
-    # Agenda o envio a cada 1 hora (ajuste conforme necessário)
+    # Agenda o envio a cada 1 hora
     schedule.every(1).hours.do(enviar_notificacoes)
 
     print("Agendamento iniciado. Aguardando execução das tarefas...")

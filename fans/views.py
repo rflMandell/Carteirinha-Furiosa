@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .forms import FanForm, DocumentoIdentidadeForm, RedeSocialForm, PerfilEsportsForm, TwitterForm, EsportsProfileForm
+from .forms import FanForm, DocumentoIdentidadeForm, RedeSocialForm, PerfilEsportsForm, TwitterForm, EsportsProfileForm, InstagramForm
 from fans.services.ocr_service import extrair_texto_documento
-from fans.services.twitter_service import obter_dados_twitter
+from fans.services.rede_sociais.twitter_service import obter_dados_twitter
+from fans.services.rede_sociais.instagram_service import buscar_informacoes_instagram
 from .models import Fan
 from .services.esports_service import validar_link_esports
+
 
 def cadastro_fan(request):
     if request.method == 'POST':
@@ -70,29 +72,6 @@ def cadastro_redes_sociais(request, fan_id):
 def cadastro_finalizado(request):
     return render(request, 'fans/cadastro_finalizado.html')
 
-def vincular_twitter(request, fan_id):
-    fan = Fan.objects.get(id=fan_id)
-
-    if request.method == 'POST':
-        form = TwitterForm(request.POST)
-        if form.is_valid():
-            twitter_handle = form.cleaned_data['twitter_handle']
-            dados_twitter = obter_dados_twitter(twitter_handle)
-
-            if dados_twitter:
-                # Armazenar dados do Twitter no banco de dados (se necessário)
-                fan.twitter_handle = twitter_handle
-                fan.save()
-
-                # Exibir dados do Twitter para o usuário
-                return render(request, 'fans/dados_twitter.html', {'dados_twitter': dados_twitter, 'fan': fan})
-            else:
-                return HttpResponse("Falha ao acessar o perfil do Twitter. Tente novamente.", status=400)
-    else:
-        form = TwitterForm()
-
-    return render(request, 'fans/vincular_twitter.html', {'form': form, 'fan': fan})
-
 def vincular_perfil_esports(request, fan_id):
     fan = Fan.objects.get(id=fan_id)
 
@@ -113,3 +92,29 @@ def vincular_perfil_esports(request, fan_id):
         form = EsportsProfileForm()
 
     return render(request, 'fans/vincular_perfil_esports.html', {'form': form, 'fan': fan})
+
+def instagram_info_view(request):
+    dados_instagram = None
+
+    if request.method == 'POST':
+        form = InstagramForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            dados_instagram = buscar_informacoes_instagram(username)
+    else:
+        form = InstagramForm()
+
+    return render(request, 'usuarios/instagram_info.html', {'form': form, 'dados_instagram': dados_instagram})
+
+def twitter_info_view(request):
+    dados_twitter = None
+
+    if request.method == 'POST':
+        form = TwitterForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            dados_twitter = obter_dados_twitter(username)
+    else:
+        form = TwitterForm()
+
+    return render(request, 'usuarios/twitter_info.html', {'form': form, 'dados_twitter': dados_twitter})

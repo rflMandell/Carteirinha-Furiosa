@@ -4,7 +4,10 @@ from .models import Fan, DocumentoIdentidade, RedeSocial, PerfilEsports
 class FanForm(forms.ModelForm):
     class Meta:
         model = Fan
-        fields = ['nome', 'endereco', 'cpf', 'telefone', 'jogos_favoritos', 'streamers_favoritos']
+        fields = [
+            'nome', 'cpf', 'endereco', 'email', 'numero_whatsapp',
+            'twitter_username', 'twitch_username', 'instagram_username', 'youtube_channel_id'
+        ]
 
 
 class DocumentoIdentidadeForm(forms.ModelForm):
@@ -23,9 +26,12 @@ class PerfilEsportsForm(forms.ModelForm):
     class Meta:
         model = PerfilEsports
         fields = ['site', 'url']
-
-class TwitterForm(forms.Form):
-    twitter_handle = forms.CharField(max_length=255, label="Handle do Twitter", required=True)
     
 class EsportsProfileForm(forms.Form):
     link_perfil_esports = forms.URLField(label="Link do Perfil de Esports", required=False, max_length=500)
+    
+class InstagramForm(forms.Form):
+    username = forms.CharField(label='Usuário do Instagram', max_length=150)
+
+class TwitterForm(forms.Form):
+    username = forms.CharField(label='Usuário do Twitter (X)', max_length=150)

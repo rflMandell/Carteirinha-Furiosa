@@ -3,13 +3,17 @@ from django.db import models
 # Create your models here.
 class Fan(models.Model):
     nome = models.CharField(max_length=255)
+    cpf = models.CharField(max_length=14)
     endereco = models.TextField()
-    cpf = models.CharField(max_length=14, unique=True)
-    telefone = models.CharField(max_length=20)
-    jogos_favoritos = models.TextField()
-    streamers_favoritos = models.TextField()
-    criado_em = models.DateTimeField(auto_now_add=True)
-    
+    email = models.EmailField()
+    numero_whatsapp = models.CharField(max_length=20)
+
+    # campos para redes sociais
+    twitter_username = models.CharField(max_length=100, blank=True, null=True)
+    twitch_username = models.CharField(max_length=100, blank=True, null=True)
+    instagram_username = models.CharField(max_length=100, blank=True, null=True)
+    youtube_channel_id = models.CharField(max_length=255, blank=True, null=True)
+
     def __str__(self):
         return self.nome
     
