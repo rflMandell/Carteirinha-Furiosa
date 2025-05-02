@@ -4,15 +4,14 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Fan(models.Model):
     nome = models.CharField(max_length=255)
-    cpf = models.CharField(max_length=14)
+    cpf = models.CharField(max_length=14, unique=True)
     endereco = models.TextField()
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     numero_whatsapp = models.CharField(max_length=20)
-
-    # campos para redes sociais
     twitter_username = models.CharField(max_length=100, blank=True, null=True)
     twitch_username = models.CharField(max_length=100, blank=True, null=True)
     instagram_username = models.CharField(max_length=100, blank=True, null=True)
+    perfil_esports_link = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.nome

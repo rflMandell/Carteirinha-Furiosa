@@ -5,6 +5,7 @@ from .models import *
 from fans.services.rede_sociais.twitter_service import obter_dados_twitter
 from fans.services.rede_sociais.instagram_service import buscar_informacoes_instagram
 from .services.esports_service import validar_link_esports
+from django.contrib.auth.decorators import login_required
 
 def cadastro_fan(request):
     if request.method == 'POST':
@@ -12,7 +13,7 @@ def cadastro_fan(request):
         
         if fan_form.is_valid():
             fan = fan_form.save()
-            return redirect('preferences', fan_id=fan.id)
+            return redirect('preferences')
     else:
         fan_form = FanForm()
 
@@ -20,14 +21,11 @@ def cadastro_fan(request):
         'fan_form': fan_form,
     })
 
+@login_required
 def select_preferences(request):
     topics = PreferenceTopic.objects.prefetch_related('options').all()
-    
     if request.method == 'POST':
-        #vai limpar as preferencias anteriores
         UserPreference.objects.filter(user=request.user).delete()
-        
-        #vai add novas preferencias
         selected_ids = request.POST.getlist('selected_options')
         for option_id in selected_ids:
             UserPreference.objects.create(
@@ -35,17 +33,14 @@ def select_preferences(request):
                 option_id=option_id
             )
         return redirect('profile')
-
-    #obtem as preferencias atuais do user (se ja existirem)
     current_preferences = UserPreference.objects.filter(
         user=request.user
     ).values_list('option_id', flat=True)
-    
     context = {
         'topics': topics,
         'current_preferences': list(current_preferences)
     }
-    return render(request, 'preferences.html', context)
+    return render(request, 'fans/preferences.html', context)
 
 def cadastro_finalizado(request):
     return render(request, 'fans/cadastro_finalizado.html')
@@ -101,14 +96,13 @@ def twitter_info_view(request):
 def home(request):
     return render(request, 'fans/home.html')
 
+@login_required
 def profile_view(request):
     user = request.user
-    #preferencias ordenada por topico
     preferences = UserPreference.objects.filter(user=user).select_related(
         'option', 'option__topic'
     ).order_by('option__topic__order', 'option__order')
-    
-    return render(request, 'profile.html', {
+    return render(request, 'fans/profile.html', {
         'user': user,
         'preferences': preferences
     })
