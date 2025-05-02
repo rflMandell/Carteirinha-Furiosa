@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .forms import FanForm, RedeSocialForm, PerfilEsportsForm, TwitterForm, EsportsProfileForm, InstagramForm
+from .forms import *
+from .models import *
 from fans.services.rede_sociais.twitter_service import obter_dados_twitter
 from fans.services.rede_sociais.instagram_service import buscar_informacoes_instagram
-from .models import Fan
 from .services.esports_service import validar_link_esports
 
 def cadastro_fan(request):
@@ -12,7 +12,7 @@ def cadastro_fan(request):
         
         if fan_form.is_valid():
             fan = fan_form.save()
-            return redirect('cadastro_redes_sociais', fan_id=fan.id)  # Passa o fan_id
+            return redirect('preferences', fan_id=fan.id)
     else:
         fan_form = FanForm()
 
@@ -20,34 +20,37 @@ def cadastro_fan(request):
         'fan_form': fan_form,
     })
 
-def cadastro_redes_sociais(request, fan_id):
+def select_preferences(request):
+    topics = PreferenceTopic.objects.prefetch_related('options').all()
+    
     if request.method == 'POST':
-        rede_form = RedeSocialForm(request.POST)
-        perfil_form = PerfilEsportsForm(request.POST)
+        #vai limpar as preferencias anteriores
+        UserPreference.objects.filter(user=request.user).delete()
+        
+        #vai add novas preferencias
+        selected_ids = request.POST.getlist('selected_options')
+        for option_id in selected_ids:
+            UserPreference.objects.create(
+                user=request.user,
+                option_id=option_id
+            )
+        return redirect('profile')
 
-        if rede_form.is_valid() and perfil_form.is_valid():
-            rede_social = rede_form.save(commit=False)
-            rede_social.fan_id = fan_id
-            rede_social.save()
-
-            perfil = perfil_form.save(commit=False)
-            perfil.fan_id = fan_id
-            perfil.save()
-
-            return redirect('cadastro_finalizado')
-
-    else:
-        rede_form = RedeSocialForm()
-        perfil_form = PerfilEsportsForm()
-
-    return render(request, 'fans/cadastro_redes_sociais.html', {
-        'rede_form': rede_form,
-        'perfil_form': perfil_form,
-    })
+    #obtem as preferencias atuais do user (se ja existirem)
+    current_preferences = UserPreference.objects.filter(
+        user=request.user
+    ).values_list('option_id', flat=True)
+    
+    context = {
+        'topics': topics,
+        'current_preferences': list(current_preferences)
+    }
+    return render(request, 'preferences.html', context)
 
 def cadastro_finalizado(request):
     return render(request, 'fans/cadastro_finalizado.html')
 
+#em breve vai de delete no betinha
 def vincular_perfil_esports(request, fan_id):
     fan = Fan.objects.get(id=fan_id)
 
@@ -97,3 +100,15 @@ def twitter_info_view(request):
 
 def home(request):
     return render(request, 'fans/home.html')
+
+def profile_view(request):
+    user = request.user
+    #preferencias ordenada por topico
+    preferences = UserPreference.objects.filter(user=user).select_related(
+        'option', 'option__topic'
+    ).order_by('option__topic__order', 'option__order')
+    
+    return render(request, 'profile.html', {
+        'user': user,
+        'preferences': preferences
+    })

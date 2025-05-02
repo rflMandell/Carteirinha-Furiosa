@@ -1,0 +1,124 @@
+{% extends 'fans/base.html' %}
+{% load static %}
+
+{% block title %}Profile | Carteirinha Furiosa{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <h1>{{ user.username }}</h1>
+        <!-- Outras informações do perfil -->
+    </div>
+    
+    <div class="profile-section">
+        <h2>Suas preferências</h2>
+        
+        {% if user.preferences.exists %}
+            {% regroup user.preferences.all|dictsort:"option.topic.name" by option.topic as topic_list %}
+            
+            {% for topic in topic_list %}
+                <div class="preference-topic">
+                    <h3>{{ topic.grouper }}</h3>
+                    <div class="preferences-list">
+                        {% for preference in topic.list %}
+                            <div class="preference-item">
+                                <div class="preference-image">
+                                    <img src="{{ preference.option.image.url }}" alt="{{ preference.option.name }}">
+                                </div>
+                                <div class="preference-name">{{ preference.option.name }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <a href="{% url 'select_preferences' %}" class="btn">Editar preferências</a>
+        {% else %}
+            <p>Você ainda não selecionou suas preferências.</p>
+            <a href="{% url 'select_preferences' %}" class="btn">Adicionar preferências</a>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .profile-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .profile-section {
+        margin: 30px 0;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .preference-topic {
+        margin: 25px 0;
+    }
+    
+    .preference-topic h3 {
+        font-size: 18px;
+        color: #333;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .preferences-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .preference-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100px;
+        transition: transform 0.2s;
+    }
+    
+    .preference-item:hover {
+        transform: scale(1.05);
+    }
+    
+    .preference-image {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .preference-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .preference-name {
+        margin-top: 8px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .btn {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #4a90e2;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-top: 20px;
+        transition: background-color 0.3s;
+    }
+    
+    .btn:hover {
+        background-color: #3a80d2;
+    }
+</style>
+{% endblock %}

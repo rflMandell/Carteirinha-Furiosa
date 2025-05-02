@@ -1,5 +1,5 @@
 from django import forms
-from .models import Fan, RedeSocial, PerfilEsports
+from .models import *
 
 class FanForm(forms.ModelForm):
     class Meta:
@@ -17,18 +17,6 @@ class FanForm(forms.ModelForm):
             })
             if isinstance(field.widget, forms.Textarea):
                 field.widget.attrs.update({'rows': 3})
-
-
-class RedeSocialForm(forms.ModelForm):
-    class Meta:
-        model = RedeSocial
-        fields = ['plataforma', 'usuario', 'url']
-
-
-class PerfilEsportsForm(forms.ModelForm):
-    class Meta:
-        model = PerfilEsports
-        fields = ['site', 'url']
     
 class EsportsProfileForm(forms.Form):
     link_perfil_esports = forms.URLField(label="Link do Perfil de Esports", required=False, max_length=500)
