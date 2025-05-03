@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Fan(models.Model):
-    nome = models.CharField(max_length=255)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     cpf = models.CharField(max_length=14, unique=True)
     endereco = models.TextField()
     email = models.EmailField(unique=True)

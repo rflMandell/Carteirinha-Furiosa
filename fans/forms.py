@@ -5,7 +5,7 @@ class FanForm(forms.ModelForm):
     class Meta:
         model = Fan
         fields = [
-            'nome', 'cpf', 'endereco', 'email', 'numero_whatsapp',
+            'cpf', 'endereco', 'email', 'numero_whatsapp',
             'twitter_username', 'twitch_username', 'instagram_username'
         ]
 

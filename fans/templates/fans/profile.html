@@ -32,10 +32,10 @@
                 </div>
             {% endfor %}
             
-            <a href="{% url 'select_preferences' %}" class="btn">Editar preferências</a>
+            <a href="{% url 'preferences' fan_id=fan.id %}" class="btn">Editar preferências</a>
         {% else %}
             <p>Você ainda não selecionou suas preferências.</p>
-            <a href="{% url 'select_preferences' %}" class="btn">Adicionar preferências</a>
+            <a href="{% url 'preferences' fan_id=fan.id %}" class="btn">Adicionar preferências</a>
         {% endif %}
     </div>
 </div>

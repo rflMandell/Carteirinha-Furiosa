@@ -1,28 +1,65 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
+from django.http import HttpResponseForbidden
 from .forms import *
 from .models import *
 from fans.services.rede_sociais.twitter_service import obter_dados_twitter
 from fans.services.rede_sociais.instagram_service import buscar_informacoes_instagram
 from .services.esports_service import validar_link_esports
-from django.contrib.auth.decorators import login_required
 
 def cadastro_fan(request):
     if request.method == 'POST':
         fan_form = FanForm(request.POST)
-        
-        if fan_form.is_valid():
-            fan = fan_form.save()
-            return redirect('preferences')
+        password = request.POST.get('password')
+        email = fan_form.data.get('email')  # ou fan_form.cleaned_data['email'] após is_valid()
+
+        if fan_form.is_valid() and password and email:
+            # Cria o User com username=email
+            user = User.objects.create_user(username=email, email=email, password=password)
+            # Cria o Fan associado ao User
+            fan = fan_form.save(commit=False)
+            fan.user = user
+            fan.save()
+            # Faz login automático
+            login(request, user)
+            return redirect('preferences', fan_id=fan.id)
     else:
         fan_form = FanForm()
 
     return render(request, 'fans/cadastro_fan.html', {
         'fan_form': fan_form,
     })
+    
+def login_email(request):
+    # Se já está logado, redireciona para o perfil do fã
+    if request.user.is_authenticated:
+        try:
+            fan = Fan.objects.get(user=request.user)
+            return redirect('profile', fan_id=fan.id)
+        except Fan.DoesNotExist:
+            return redirect('home')
+
+    error = None
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            login(request, user)
+            try:
+                fan = Fan.objects.get(user=user)
+                return redirect('profile', fan_id=fan.id)
+            except Fan.DoesNotExist:
+                return redirect('home')
+        else:
+            error = 'E-mail ou senha inválidos.'
+    return render(request, 'fans/login.html', {'error': error})
 
 @login_required
-def select_preferences(request):
+def select_preferences(request, fan_id):
     topics = PreferenceTopic.objects.prefetch_related('options').all()
     if request.method == 'POST':
         UserPreference.objects.filter(user=request.user).delete()
@@ -32,13 +69,14 @@ def select_preferences(request):
                 user=request.user,
                 option_id=option_id
             )
-        return redirect('profile')
+        return redirect('profile', fan_id=fan_id)  # Redireciona para o perfil correto
     current_preferences = UserPreference.objects.filter(
         user=request.user
     ).values_list('option_id', flat=True)
     context = {
         'topics': topics,
-        'current_preferences': list(current_preferences)
+        'current_preferences': list(current_preferences),
+        'fan_id': fan_id,
     }
     return render(request, 'fans/preferences.html', context)
 
@@ -97,12 +135,21 @@ def home(request):
     return render(request, 'fans/home.html')
 
 @login_required
-def profile_view(request):
-    user = request.user
-    preferences = UserPreference.objects.filter(user=user).select_related(
+def profile_view(request, fan_id):
+    try:
+        fan = Fan.objects.get(id=fan_id)
+    except Fan.DoesNotExist:
+        return HttpResponseForbidden("Perfil não encontrado.")
+
+    # Checagem de segurança: só o dono pode acessar
+    if fan.user != request.user:
+        return HttpResponseForbidden("Você não pode acessar o perfil de outro usuário.")
+
+    preferences = UserPreference.objects.filter(user=fan.user).select_related(
         'option', 'option__topic'
     ).order_by('option__topic__order', 'option__order')
+
     return render(request, 'fans/profile.html', {
-        'user': user,
-        'preferences': preferences
+        'preferences': preferences,
+        'fan': fan,
     })
