@@ -24,8 +24,12 @@
               <div class="option-item cursor-pointer transition rounded-xl p-4 border-2 
                           {% if option.id in current_preferences %}border-yellow-500 bg-yellow-50 scale-105 shadow-lg{% else %}border-transparent bg-white{% endif %}"
                    data-option-id="{{ option.id }}">
-                <div class="w-24 h-24 mx-auto overflow-hidden rounded-full mb-4 shadow">
-                  <img src="{{ option.image.url }}" alt="{{ option.name }}" class="w-full h-full object-cover">
+                <div class="w-24 h-24 mx-auto overflow-hidden rounded-full mb-4 shadow bg-gray-200 flex items-center justify-center">
+                  {% if option.image %}
+                    <img src="{{ option.image.url }}" alt="{{ option.name }}" class="w-full h-full object-cover">
+                  {% else %}
+                    <span class="text-gray-400 text-3xl">?</span>
+                  {% endif %}
                 </div>
                 <div class="text-center font-semibold text-black uppercase text-sm">{{ option.name }}</div>
                 <input type="checkbox" name="selected_options" value="{{ option.id }}"

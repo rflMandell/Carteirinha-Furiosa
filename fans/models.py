@@ -4,17 +4,19 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Fan(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    nome_completo = models.CharField(max_length=100)
     cpf = models.CharField(max_length=14, unique=True)
     endereco = models.TextField()
     email = models.EmailField(unique=True)
     numero_whatsapp = models.CharField(max_length=20)
     twitter_username = models.CharField(max_length=100, blank=True, null=True)
-    twitch_username = models.CharField(max_length=100, blank=True, null=True)
     instagram_username = models.CharField(max_length=100, blank=True, null=True)
+    instagram_id = models.CharField(max_length=100, blank=True, null=True)
     perfil_esports_link = models.URLField(blank=True, null=True)
 
     def __str__(self):
-        return self.nome
+        return self.nome_completo
     
 class PreferenceTopic(models.Model):
     name = models.CharField(max_length=100)

@@ -12,7 +12,7 @@ from .services.esports_service import validar_link_esports
 
 def cadastro_fan(request):
     if request.method == 'POST':
-        fan_form = FanForm(request.POST)
+        fan_form = FanForm(request.POST, request.FILES)
         password = request.POST.get('password')
         email = fan_form.data.get('email')  # ou fan_form.cleaned_data['email'] após is_valid()
 
@@ -105,45 +105,66 @@ def vincular_perfil_esports(request, fan_id):
 
     return render(request, 'fans/vincular_perfil_esports.html', {'form': form, 'fan': fan})
 
+@login_required
 def instagram_info_view(request):
     dados_instagram = None
+    fan = Fan.objects.get(user=request.user)
 
     if request.method == 'POST':
         form = InstagramForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
+            username = form.cleaned_data['instagram_username']
             dados_instagram = buscar_informacoes_instagram(username)
+            fan.instagram_username = username
+            fan.save()
+            return redirect('profile', fan_id=fan.id)
     else:
-        form = InstagramForm()
+        form = InstagramForm(initial={'instagram_username': fan.instagram_username})
 
-    return render(request, 'fans/instagram_info.html', {'form': form, 'dados_instagram': dados_instagram})
+    return render(request, 'fans/instagram_info.html', {
+        'form': form,
+        'dados_instagram': dados_instagram,
+        'fan': fan
+    })
 
+@login_required
 def twitter_info_view(request):
+    fan = Fan.objects.get(user=request.user)
     dados_twitter = None
 
     if request.method == 'POST':
         form = TwitterForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            dados_twitter = obter_dados_twitter(username)
+            username = form.cleaned_data['twitter_username']
+        # dados_twitter = buscar_informacoes_twitter(username)
+            fan.twitter_username = username
+            fan.save()
+            return redirect('profile', fan_id=fan.id)
     else:
-        form = TwitterForm()
+        form = TwitterForm(initial={'twitter_username': fan.twitter_username})
 
-    return render(request, 'fans/twitter_info.html', {'form': form, 'dados_twitter': dados_twitter})
+    return render(request, 'fans/twitter_info.html', {
+    'form': form,
+    'dados_twitter': dados_twitter,
+    'fan': fan
+})
 
 def home(request):
     return render(request, 'fans/home.html')
 
 @login_required
 def profile_view(request, fan_id):
-    try:
-        fan = Fan.objects.get(id=fan_id)
-    except Fan.DoesNotExist:
-        return HttpResponseForbidden("Perfil não encontrado.")
-
-    # Checagem de segurança: só o dono pode acessar
+    fan = Fan.objects.get(id=fan_id)
     if fan.user != request.user:
         return HttpResponseForbidden("Você não pode acessar o perfil de outro usuário.")
+
+    if request.method == 'POST':
+        form = FanForm(request.POST, request.FILES, instance=fan)
+        if form.is_valid():
+            form.save()
+            return redirect('profile', fan_id=fan_id)
+    else:
+        form = FanForm(instance=fan)
 
     preferences = UserPreference.objects.filter(user=fan.user).select_related(
         'option', 'option__topic'
@@ -152,4 +173,5 @@ def profile_view(request, fan_id):
     return render(request, 'fans/profile.html', {
         'preferences': preferences,
         'fan': fan,
+        'form': form,
     })

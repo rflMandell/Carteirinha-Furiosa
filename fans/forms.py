@@ -5,8 +5,7 @@ class FanForm(forms.ModelForm):
     class Meta:
         model = Fan
         fields = [
-            'cpf', 'endereco', 'email', 'numero_whatsapp',
-            'twitter_username', 'twitch_username', 'instagram_username'
+            'profile_picture', 'nome_completo', 'cpf', 'endereco', 'email', 'numero_whatsapp',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -22,7 +21,7 @@ class EsportsProfileForm(forms.Form):
     link_perfil_esports = forms.URLField(label="Link do Perfil de Esports", required=False, max_length=500)
     
 class InstagramForm(forms.Form):
-    username = forms.CharField(label='Usuário do Instagram', max_length=150)
+    instagram_username = forms.CharField(label='Seu @ do Instagram', max_length=100)
 
 class TwitterForm(forms.Form):
-    username = forms.CharField(label='Usuário do Twitter (X)', max_length=150)
+    twitter_username = forms.CharField(label='Seu @ do Twitter', max_length=100)
