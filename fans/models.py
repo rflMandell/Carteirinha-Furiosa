@@ -1,32 +1,59 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Fan(models.Model):
-    nome = models.CharField(max_length=255)
-    cpf = models.CharField(max_length=14)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    nome_completo = models.CharField(max_length=100)
+    cpf = models.CharField(max_length=14, unique=True)
     endereco = models.TextField()
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     numero_whatsapp = models.CharField(max_length=20)
-
-    # campos para redes sociais
     twitter_username = models.CharField(max_length=100, blank=True, null=True)
-    twitch_username = models.CharField(max_length=100, blank=True, null=True)
     instagram_username = models.CharField(max_length=100, blank=True, null=True)
-    youtube_channel_id = models.CharField(max_length=255, blank=True, null=True)
-
-    def __str__(self):
-        return self.nome
-    
-class DocumentoIdentidade(models.Model):
-    fan = models.OneToOneField(Fan, on_delete=models.CASCADE)
-    documento = models.FileField(upload_to='documentos/')
-    dados_extraidos = models.JSONField(null=True, blank=True)  # Resultado do OCR
+    instagram_id = models.CharField(max_length=100, blank=True, null=True)
+    perfil_esports_link = models.URLField(blank=True, null=True)
+    documento_validacao = models.FileField(upload_to='documentos/validacao/', blank=True, null=True)
     validado = models.BooleanField(default=False)
+    motivo_validacao = models.CharField(max_length=255, blank=True, null=True) # para feedbacks
 
     def __str__(self):
-        return f"Documento de {self.fan.nome}"
+        return self.nome_completo
+    
+class PreferenceTopic(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+    order = models.PositiveBigIntegerField(default=0)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ['order', 'name']
 
-
+class PreferenceOption(models.Model):
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='preferences/')
+    topic = models.ForeignKey(PreferenceTopic, related_name='options', on_delete=models.CASCADE)
+    order = models.PositiveIntegerField(default=0)
+    
+    def __str__(self):
+        return f"{self.topic.name} - {self.name}"
+    
+    class Meta:
+        ordering = ['topic', 'order', 'name']
+        
+class UserPreference(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='preferences')
+    option = models.ForeignKey(PreferenceOption, on_delete=models.CASCADE)
+    
+    class Meta:
+        unique_together = ('user', 'option')
+        
+    def __str__(self):
+        return f"{self.user.username} - {self.option.name}"
+    
 class RedeSocial(models.Model):
     fan = models.ForeignKey(Fan, on_delete=models.CASCADE, related_name='redes_sociais')
     plataforma = models.CharField(max_length=50)  # Ex: Twitter, Instagram, Twitch  YouTube e por ai vai
@@ -34,15 +61,8 @@ class RedeSocial(models.Model):
     url = models.URLField()
     dados_extraidos = models.JSONField(null=True, blank=True)  # Dados públicos coletados
 
-    def __str__(self):
-        return f"{self.plataforma} - {self.usuario}"
-
-
 class PerfilEsports(models.Model):
     fan = models.ForeignKey(Fan, on_delete=models.CASCADE, related_name='perfis_esports')
     site = models.CharField(max_length=100)  # Ex: HLTV, Liquipedia, VLR?
     url = models.URLField()
     verificado = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.site} de {self.fan.nome}"

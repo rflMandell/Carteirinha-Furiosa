@@ -1,0 +1,17 @@
+{% extends 'fans/base.html' %}
+{% block content %}
+<h2>Validar Perfil</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Enviar Documento</button>
+</form>
+{% if fan.documento_validacao %}
+    <p>Documento enviado: <a href="{{ fan.documento_validacao.url }}" target="_blank">Ver documento</a></p>
+{% endif %}
+{% if fan.validado %}
+    <div class="alert alert-success mt-3">Perfil validado com sucesso!</div>
+{% elif fan.motivo_validacao %}
+    <div class="alert alert-danger mt-3">Validação falhou: {{ fan.motivo_validacao }}</div>
+{% endif %}
+{% endblock %}

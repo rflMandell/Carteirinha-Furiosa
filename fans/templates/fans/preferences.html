@@ -1,0 +1,71 @@
+{% extends 'fans/base.html' %}
+{% load static %}
+
+{% block title %}Preferências | Carteirinha Furiosa{% endblock %}
+
+{% block content %}
+<section class="bg-white text-black py-16 px-6 md:px-16">
+  <div class="max-w-7xl mx-auto">
+    <h1 class="text-3xl md:text-4xl font-bold uppercase mb-6 text-center">Escolha seus preferidos</h1>
+    <p class="text-lg text-gray-700 text-center mb-12">Clique nas opções que você mais gosta e personalize sua Carteirinha Furiosa.</p>
+
+    <form method="post" id="preferences-form">
+      {% csrf_token %}
+
+      {% for topic in topics %}
+        <div class="mb-12 p-6 bg-gray-100 rounded-xl shadow-md">
+          <h2 class="text-2xl font-bold uppercase border-b-2 border-yellow-500 pb-2 mb-2">{{ topic.name }}</h2>
+          {% if topic.description %}
+            <p class="text-gray-600 mb-6">{{ topic.description }}</p>
+          {% endif %}
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            {% for option in topic.options.all %}
+              <div class="option-item cursor-pointer transition rounded-xl p-4 border-2 
+                          {% if option.id in current_preferences %}border-yellow-500 bg-yellow-50 scale-105 shadow-lg{% else %}border-transparent bg-white{% endif %}"
+                   data-option-id="{{ option.id }}">
+                <div class="w-24 h-24 mx-auto overflow-hidden rounded-full mb-4 shadow bg-gray-200 flex items-center justify-center">
+                  {% if option.image %}
+                    <img src="{{ option.image.url }}" alt="{{ option.name }}" class="w-full h-full object-cover">
+                  {% else %}
+                    <span class="text-gray-400 text-3xl">?</span>
+                  {% endif %}
+                </div>
+                <div class="text-center font-semibold text-black uppercase text-sm">{{ option.name }}</div>
+                <input type="checkbox" name="selected_options" value="{{ option.id }}"
+                       {% if option.id in current_preferences %}checked{% endif %} class="hidden-checkbox hidden">
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+
+      <div class="text-center mt-10">
+        <button type="submit"
+                class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold uppercase px-8 py-4 rounded-lg transition">
+          Salvar Preferências
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const optionItems = document.querySelectorAll('.option-item');
+
+    optionItems.forEach(item => {
+      item.addEventListener('click', function () {
+        const checkbox = this.querySelector('input[type="checkbox"]');
+        const isSelected = checkbox.checked;
+
+        checkbox.checked = !isSelected;
+        this.classList.toggle('border-yellow-500');
+        this.classList.toggle('bg-yellow-50');
+        this.classList.toggle('scale-105');
+        this.classList.toggle('shadow-lg');
+      });
+    });
+  });
+</script>
+{% endblock %}

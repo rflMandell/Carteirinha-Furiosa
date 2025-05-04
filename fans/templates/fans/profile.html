@@ -1,0 +1,105 @@
+{% extends 'fans/base.html' %}
+{% load static %}
+
+{% block title %}Perfil | Carteirinha Furiosa{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-6 py-12">
+
+    <!-- Cabeçalho do perfil -->
+    <div class="flex flex-col md:flex-row items-center gap-8 mb-12 bg-white shadow-md rounded-xl p-8">
+        <div>
+            {% if fan.profile_picture %}
+                <img src="{{ fan.profile_picture.url }}" alt="Foto de perfil"
+                     class="rounded-full w-32 h-32 object-cover border-4 border-yellow-500">
+            {% else %}
+                <img src="{% static 'img/default-profile.png' %}" alt="Sem foto"
+                     class="rounded-full w-32 h-32 object-cover border-4 border-gray-300">
+            {% endif %}
+        </div>
+        <div class="text-center md:text-left">
+            <h1 class="text-3xl font-bold text-black mb-2">
+                {{ fan.nome_completo|default:user.get_full_name }}
+            </h1>
+            <p class="text-gray-600 text-lg">E-mail: {{ user.email }}</p>
+
+            <!-- Redes Sociais -->
+            <div class="flex gap-4 mt-4 justify-center md:justify-start">
+                {% if fan.instagram_username %}
+                    <a href="https://instagram.com/{{ fan.instagram_username }}" target="_blank" title="Instagram">
+                        <img src="{% static 'images/insta.webp' %}" alt="Instagram" class="w-8 h-8">
+                    </a>
+                {% else %}
+                    <a href="{% url 'instagram_info' %}" class="text-sm text-blue-600 hover:underline">
+                        Vincular Instagram
+                    </a>
+                {% endif %}
+
+                {% if fan.twitter_username %}
+                    <a href="https://twitter.com/{{ fan.twitter_username }}" target="_blank" title="Twitter">
+                        <img src="{% static 'images/twitter.png' %}" alt="Twitter" class="w-8 h-8">
+                    </a>
+                {% else %}
+                    <a href="{% url 'twitter_info' %}" class="text-sm text-blue-600 hover:underline">
+                        Vincular Twitter
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Validacao de conta -->
+    <div class="mt-4">
+        {% if fan.validado %}
+            <span class="badge bg-success">Perfil validado</span>
+        {% else %}
+            <a href="{% url 'validar_perfil' %}" class="btn btn-warning">Validar perfil</a>
+            {% if fan.motivo_validacao %}
+                <div class="alert alert-danger mt-2">Última tentativa: {{ fan.motivo_validacao }}</div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+
+    <!-- Preferências -->
+    <div class="bg-gray-50 p-8 rounded-xl shadow">
+        <h2 class="text-2xl font-bold text-black mb-6">Suas Preferências</h2>
+
+        {% if preferences %}
+            {% regroup preferences by option.topic as topic_list %}
+            {% for topic in topic_list %}
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold border-b border-gray-300 pb-2 text-gray-800 uppercase mb-4">
+                        {{ topic.grouper }}
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                        {% for preference in topic.list %}
+                            <div class="flex flex-col items-center hover:scale-105 transition transform">
+                                <div class="w-20 h-20 rounded-full overflow-hidden shadow-md">
+                                    <img src="{{ preference.option.image.url }}" alt="{{ preference.option.name }}"
+                                         class="w-full h-full object-cover">
+                                </div>
+                                <span class="mt-2 text-sm text-center font-medium text-gray-700">
+                                    {{ preference.option.name }}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="text-center">
+                <a href="{% url 'preferences' fan_id=fan.id %}"
+                   class="inline-block bg-yellow-500 hover:bg-yellow-600 text-black font-bold uppercase px-6 py-3 rounded-lg transition">
+                    Editar Preferências
+                </a>
+            </div>
+        {% else %}
+            <p class="text-gray-600 mb-4">Você ainda não selecionou suas preferências.</p>
+            <a href="{% url 'preferences' fan_id=fan.id %}"
+               class="inline-block bg-yellow-500 hover:bg-yellow-600 text-black font-bold uppercase px-6 py-3 rounded-lg transition">
+                Adicionar Preferências
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
