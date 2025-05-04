@@ -12,6 +12,7 @@ from fans.services.rede_sociais.twitter_service import obter_dados_twitter
 from fans.services.rede_sociais.instagram_service import buscar_informacoes_instagram
 from .services.esports_service import validar_link_esports
 import openai
+import re
 
 
 def cadastro_fan(request):
@@ -189,26 +190,45 @@ def validar_perfil(request):
         form = DocumentoValidacaoForm(request.POST, request.FILES, instance=fan)
         if form.is_valid():
             form.save()
-            # Leitura do documento (exemplo para PDF ou TXT)
+            # Leitura do documento (PDF ou TXT)
             doc_file = fan.documento_validacao
             doc_text = ""
             if doc_file.name.endswith('.pdf'):
                 import PyPDF2
                 reader = PyPDF2.PdfReader(doc_file)
-                doc_text = "".join(page.extract_text() for page in reader.pages)
+                doc_text = ""
+                for i, page in enumerate(reader.pages):
+                    if i >= 5:  # lê até 5 páginas, ajuste se quiser
+                        break
+                    doc_text += page.extract_text() or ""
             else:
                 doc_text = doc_file.read().decode('utf-8', errors='ignore')
 
-            # Chamada à OpenAI para análise
+            # Filtra só as linhas importantes (nome ou CPF)
+            linhas = doc_text.splitlines()
+            linhas_importantes = []
+            regex_cpf = re.compile(r'\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b')
+            for linha in linhas:
+                linha_lower = linha.lower()
+                if fan.nome_completo.lower() in linha_lower or regex_cpf.search(linha):
+                    linhas_importantes.append(linha.strip())
+            # Se não encontrar nada, envia as 10 primeiras linhas como fallback
+            if not linhas_importantes:
+                linhas_importantes = linhas[:10]
+            doc_text_filtrado = "\n".join(linhas_importantes)
+            # Limita o texto para garantir que não exceda o limite de tokens
+            doc_text_filtrado = doc_text_filtrado[:8000]
+
+            # Chamada à OpenAI (GPT-4o)
             prompt = (
-                f"Analise o seguinte documento e diga se o nome '{fan.nome_completo}' e o CPF '{fan.cpf}' "
+                f"Analise as linhas abaixo e diga se o nome '{fan.nome_completo}' e o CPF '{fan.cpf}' "
                 "estão presentes e corretos. Responda apenas 'VALIDADO' se sim, ou 'NÃO VALIDADO' se não, "
                 "e explique o motivo se não for validado.\n\n"
-                f"Documento:\n{doc_text}"
+                f"Linhas extraídas do documento:\n{doc_text_filtrado}"
             )
-            openai.api_key = settings.OPENAI_API_KEY
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+            client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+            response = client.chat.completions.create(
+                model="gpt-4o",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=100
             )
@@ -231,4 +251,4 @@ def validar_perfil(request):
         'form': form,
         'fan': fan,
         'resultado': resultado,
-})
+    })
