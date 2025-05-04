@@ -14,6 +14,9 @@ class Fan(models.Model):
     instagram_username = models.CharField(max_length=100, blank=True, null=True)
     instagram_id = models.CharField(max_length=100, blank=True, null=True)
     perfil_esports_link = models.URLField(blank=True, null=True)
+    documento_validacao = models.FileField(upload_to='documentos/validacao/', blank=True, null=True)
+    validado = models.BooleanField(default=False)
+    motivo_validacao = models.CharField(max_length=255, blank=True, null=True) # para feedbacks
 
     def __str__(self):
         return self.nome_completo

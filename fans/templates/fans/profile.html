@@ -48,6 +48,19 @@
         </div>
     </div>
 
+    <!-- Validacao de conta -->
+    <div class="mt-4">
+        {% if fan.validado %}
+            <span class="badge bg-success">Perfil validado</span>
+        {% else %}
+            <a href="{% url 'validar_perfil' %}" class="btn btn-warning">Validar perfil</a>
+            {% if fan.motivo_validacao %}
+                <div class="alert alert-danger mt-2">Última tentativa: {{ fan.motivo_validacao }}</div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+
     <!-- Preferências -->
     <div class="bg-gray-50 p-8 rounded-xl shadow">
         <h2 class="text-2xl font-bold text-black mb-6">Suas Preferências</h2>

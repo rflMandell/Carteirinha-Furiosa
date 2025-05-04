@@ -3,12 +3,16 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from django.contrib import messages
 from django.http import HttpResponseForbidden
+from django.conf import settings
 from .forms import *
 from .models import *
 from fans.services.rede_sociais.twitter_service import obter_dados_twitter
 from fans.services.rede_sociais.instagram_service import buscar_informacoes_instagram
 from .services.esports_service import validar_link_esports
+import openai
+
 
 def cadastro_fan(request):
     if request.method == 'POST':
@@ -175,3 +179,56 @@ def profile_view(request, fan_id):
         'fan': fan,
         'form': form,
     })
+    
+@login_required
+def validar_perfil(request):
+fan = Fan.objects.get(user=request.user)
+resultado = None
+
+if request.method == 'POST':
+    form = DocumentoValidacaoForm(request.POST, request.FILES, instance=fan)
+    if form.is_valid():
+        form.save()
+        # Leitura do documento (exemplo para PDF ou TXT)
+        doc_file = fan.documento_validacao
+        doc_text = ""
+        if doc_file.name.endswith('.pdf'):
+            import PyPDF2
+            reader = PyPDF2.PdfReader(doc_file)
+            doc_text = "".join(page.extract_text() for page in reader.pages)
+        else:
+            doc_text = doc_file.read().decode('utf-8', errors='ignore')
+
+        # Chamada à OpenAI para análise
+        prompt = (
+            f"Analise o seguinte documento e diga se o nome '{fan.nome_completo}' e o CPF '{fan.cpf}' "
+            "estão presentes e corretos. Responda apenas 'VALIDADO' se sim, ou 'NÃO VALIDADO' se não, "
+            "e explique o motivo se não for validado.\n\n"
+            f"Documento:\n{doc_text}"
+        )
+        openai.api_key = settings.OPENAI_API_KEY
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=100
+        )
+        resultado = response.choices[0].message.content.strip()
+        if resultado.startswith("VALIDADO"):
+            fan.validado = True
+            fan.motivo_validacao = ""
+            fan.save()
+            messages.success(request, "Perfil validado com sucesso!")
+        else:
+            fan.validado = False
+            fan.motivo_validacao = resultado
+            fan.save()
+            messages.error(request, f"Validação falhou: {resultado}")
+        return redirect('profile', fan_id=fan.id)
+else:
+    form = DocumentoValidacaoForm(instance=fan)
+
+return render(request, 'fans/validar_perfil.html', {
+    'form': form,
+    'fan': fan,
+    'resultado': resultado,
+})

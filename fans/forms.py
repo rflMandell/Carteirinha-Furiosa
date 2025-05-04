@@ -25,3 +25,8 @@ class InstagramForm(forms.Form):
 
 class TwitterForm(forms.Form):
     twitter_username = forms.CharField(label='Seu @ do Twitter', max_length=100)
+    
+class DocumentoValidacaoForm(forms.ModelForm):
+    class Meta:
+        model = Fan
+        fields = ['documento_validacao']

@@ -11,4 +11,5 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('perfil/<int:fan_id>/', views.profile_view, name='profile'),
     path('login/', views.login_email, name='login'),
+    path('validar-perfil/', views.validar_perfil, name='validar_perfil'),
 ]
