@@ -1,9 +1,6 @@
 # Ignorar o arquivo .env (credenciais e tokens)
 .env
 
-# Ignorar arquivos de banco de dados SQLite
-.sqlite3
-
 # Ignorar diretórios de cache
 __pycache__/
 .pyc
