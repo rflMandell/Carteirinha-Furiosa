@@ -41,8 +41,7 @@ O **Carteirinha Furiosa** é uma plataforma Django para cadastro de fãs, escolh
 
 1. **Clone o repositório:**
    ```bash
-   git clone https://github.com/seu-usuario/know-your-fan.git
-   cd know-your-fan
+   git clone https://github.com/rflMandell/Carteirinha-Furiosa
    ```
 
 2. **Crie e ative um ambiente virtual:**
